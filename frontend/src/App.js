@@ -1,8 +1,10 @@
 import React, {useReducer, useEffect} from 'react'
+import {useSelector, useDispatch} from 'react-redux'
+import {deleteProduct,editProduct,addProduct, getProducts, addStore} from './redux/productSlice'
 
 import './App.css';
 // import {v4 as uuidv4} from 'uuid'
-import productReducer from './reducers/productReducer'
+//import productReducer from './reducers/productReducer'
 import ProductCard from './components/ProductCard';
 
 function App() {
@@ -50,22 +52,29 @@ function App() {
   //     price: 20.99     
   //   }
   // ]
-
+  
   // const [product, dispatch] = useReducer(productReducer, initialState)
 
-  const [product, dispatch] = useReducer(productReducer, [])
+  // const [product, dispatch] = useReducer(productReducer, [])
+
+  const dispatch = useDispatch()
+  const product = useSelector((state => state.product))
+
  useEffect(() => {
   const loadData = async () => {
-    const response = await fetch('http://localhost:4000/api/products/get-all-products')
+    const response = await fetch('http://localhost:4001/api/products/get-all-products')
     const data = await response.json()
-    // console.log(data)
-    dispatch({
-      type: 'get-products',
-      payload: data
-    })
+    console.log(data)
+    dispatch(getProducts(data))
+
   }
   loadData()
  }, [])
+
+//  dispatch({
+//   type: 'get-products',
+//   payload: data
+// })
  
 
  //make a button the calls to the store/list-products route
@@ -91,22 +100,30 @@ function App() {
 // },
 
 const getAPIdata = async () => {
-  const response = await fetch('http://localhost:4000/api/store/list-products')
+  const response = await fetch('http://localhost:4001/api/store/list-products')
   const data = await response.json()
-  dispatch({
-    type: 'add-store',
-    payload: data
-  })
+  dispatch( addStore(data) )
+
 }
+
+// dispatch({
+//   type: 'add-store',
+//   payload: data
+// })
 
   return (
     <div className="App">
       <h1>Video Game Products</h1>
       <button onClick={
-        () => dispatch({
-          type: 'add-product'
-        })
+        () => dispatch(
+          addProduct()
+        )
       }>Add Product</button>
+
+
+ {/* () => dispatch({
+          type: 'add-product'
+        })  */}
 
       <button onClick={getAPIdata}>API</button>
       
@@ -121,16 +138,16 @@ const getAPIdata = async () => {
             genre={element.genre}
             price={element.price}
             deleteProduct = {
-              (id) => dispatch({
-                type: 'delete-product',
-                id: id
-              })
+              (id) => dispatch(
+                deleteProduct(id)
+                
+            )
             }
             editProduct = {
-              (param) => dispatch({
-                type: 'edit-product',
-                editedObj: param
-              })
+              (param) => dispatch(
+                editProduct({editedObj: param})
+                
+              )
             }
           /> 
           )
@@ -141,3 +158,14 @@ const getAPIdata = async () => {
 }
 
 export default App;
+
+
+// (id) => dispatch({
+//   type: 'delete-product',
+//   id: id
+// })
+
+// (param) => dispatch({
+//   type: 'edit-product',
+//   editedObj: param
+// })
